@@ -206,13 +206,13 @@ Figure~\ref{fig:scaling} shows the five-seed screen. Increasing depth improved t
 The encoding and topology ablation favored one encoding stage and linear entanglement. For CIFAR-10 at 8 qubits and depth 4, switching from ring to linear increased validation macro-F1 from 0.9070 to 0.9259. Re-uploading reduced it to 0.8844 with linear and 0.8658 with ring. For PathMNIST at 8 qubits and depth 6, the corresponding scores were 0.8145 for encode-once linear, 0.8065 for encode-once ring, 0.7433 for re-uploaded linear, and 0.6777 for re-uploaded ring. Table~\ref{tab:selected} reports the locked finalists and their confirmatory result.
 
 \begin{table}[htbp]
-\caption{Validation-selected configurations and post-freeze analytic test results}\label{tab:selected}
+\caption{Validation-selected configurations and post-freeze analytic test results. Circuit entries use qubits/depth; encoding/graph}\label{tab:selected}
 \centering
 \scriptsize
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}llrrrr@{}}
 \toprule
-\textbf{Dataset} & \textbf{Circuit (qubits/depth; encoding/graph)} & \textbf{Seeds} & \textbf{Val macro-F1} & \textbf{Test macro-F1} & \textbf{Test accuracy} \\
+\textbf{Dataset} & \textbf{Circuit} & \textbf{Seeds} & \textbf{Val macro-F1} & \textbf{Test macro-F1} & \textbf{Test accuracy} \\
 \midrule
 CIFAR-10 & 8/4; once/linear & 10 & $0.9255\pm0.0075$ & $0.9145\pm0.0069$ & $0.9145\pm0.0068$ \\
 PathMNIST & 8/6; once/linear & 10 & $0.8108\pm0.0117$ & $0.7422\pm0.0283$ & $0.7932\pm0.0232$ \\
