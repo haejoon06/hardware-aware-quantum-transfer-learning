@@ -1,12 +1,20 @@
 {
-  "completed_at": "2026-10-16T00:58:09.387839+00:00",
+  "completed_at": "2026-10-16T01:14:00.308111+00:00",
   "figures": {
+    "figure_00_workflow.png": "17b614ddc2da2659818a1b2514471aebfe8b6abfe14ca97bd9af9ce9aef2c270",
+    "figure_00_workflow.svg": "8638049ae72fb979299f02d3032cf54581ceedef2339e5e5436525d22d821716",
     "figure_01_width_depth_scaling.png": "66faffcc579b8de2133d824eb522311cd7cd7d7c8fcae6b10c0ecf12a38655c7",
-    "figure_01_width_depth_scaling.svg": "6c3c8dd7b1898678116fa4d9e662df360a0d78c5700dd2ef85cb167c4c35a3e0",
-    "figure_02_finite_shots.png": "69c4c1d6490712c6a4e39ca003dbfadf18923ece43cca624c0edba534638b269",
-    "figure_02_finite_shots.svg": "c784046e5822105239c5252631f10f4caa72013a1b222f6442faa16b429cd2e6"
+    "figure_01_width_depth_scaling.svg": "357a02d62f1e130657115d5a682b32af3d7535fa8a6bb7d1ff17a88301b47684",
+    "figure_02_finite_shots.png": "a0b497d1a3dc829433d566353d8ba2252fd67146aed3381889909db658c6c22d",
+    "figure_02_finite_shots.svg": "1bd77a2c1cfd5150d55b06ffdd2a305f9a881ffd7d89aa2df39667743c362086",
+    "figure_03_noise_sensitivity.png": "1299588bd42f4a0a574668a1f4f1057c8cc81f825f38864b2e2f2a064d682ebd",
+    "figure_03_noise_sensitivity.svg": "13da3433a9537b27fedcdfbb14832ddcf848ebef9cd2b31dabc7eaaea57ef93a",
+    "figure_04_connectivity_overhead.png": "b5cdb4224868b51837adfd47b51c6dbe7419d612e1f1cd5161606e63de7ef6ee",
+    "figure_04_connectivity_overhead.svg": "c334dec05d295436140bac70b1b71d301383c657cfdb75c525f5442793511608",
+    "figure_05_trainability.png": "cc92fd2d390d205d39e44855248749f250b842e035d2e18d15c2dcaa575bea2a",
+    "figure_05_trainability.svg": "cee5dd794ec7839c774552e63d40d7b43298f185d0a60574b0bc6cfd72ebe4f3"
   },
-  "notebook": "c671345ad6d090fcdfccbb9546ccde6cceca3d99e6a1351f52adf767fd8b6867",
+  "notebook": "e65cdaf88688d181a7a2025507a0d9bd440d62b4b85ce931888d3b0e888cf9e5",
   "protocol_sha256": "76f3d7c0330632b86c92d140f2ded5a67944176d07ad001e46992156dbcfb22b",
   "selection": {
     "candidate_summary_sha256": "f1e448a944013cb5f45742d24d6baeea643e76d6381a479a34da11e895bc8f05",
@@ -59,6 +67,7 @@
     "finite_shot_summary_with_ci.csv": "67cd47edf0e045c6d98b97da974849d918b422cc2011b6f46a5403bbb6c6ffcb",
     "noise_degradation_summary.csv": "5146ae6ed27692bbffb56f65a40db0371e53d776b1632ca9e0195e63fc0d3a47",
     "screen_validation_summary.csv": "f8308f6128d3bcc8cdca882b1c6bdfb9f4675f7d6835b15301c41cbc40a76404",
-    "transpilation_metrics.csv": "8c885283986fd28c9e0b34bfe21a1ffd766a1038c60bd7f3ecc5dcabb03268b9"
+    "trainability_summary.csv": "6ad79cfb6e8dc9819545c089782848219323bf4a9d25f4d66bc2d70d247fb5fd",
+    "transpilation_metrics.csv": "b44ac41fbaef09be711e86b04ca96549a38e1811b46f6ca6255319c6c8fbc0cd"
   }
 }

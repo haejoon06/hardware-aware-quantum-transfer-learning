@@ -6,6 +6,7 @@ import json
 import math
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -946,14 +947,26 @@ def evaluate_noise_dataset(dataset: str, config: dict[str, Any], resume: bool, c
 def run_transpile(config: dict[str, Any], resume: bool) -> None:
     output = RESULTS / "tables" / "transpilation_metrics.csv"
     success = STATE / "TRANSPILE_SUCCESS.json"
-    stage_hash = sha256_json({"protocol": config["_hash"], "architectures": config["architecture"]})
+    stage_hash = sha256_json(
+        {
+            "protocol": config["_hash"],
+            "architectures": config["architecture"],
+            "logical_entanglements": ["linear", "ring"],
+            "transpilation_table_version": 2,
+        }
+    )
     if resume and success.exists() and output.exists() and json.loads(success.read_text())["stage_hash"] == stage_hash:
         return
     from qiskit import transpile
     from qiskit.transpiler import CouplingMap
 
     records = []
-    specs = _screen_specs(config)
+    specs = [
+        CircuitSpec(int(qubits), int(depth), "once", entanglement)
+        for qubits in config["architecture"]["qubits"]
+        for depth in config["architecture"]["depths"]
+        for entanglement in ("linear", "ring")
+    ]
     for spec in specs:
         theta = np.zeros((spec.depth, spec.qubits, 3), dtype=np.float64)
         circuit = _qiskit_circuit(spec, np.zeros(6), theta, measure=False)
@@ -998,6 +1011,36 @@ def run_confirm(config: dict[str, Any], resume: bool, max_epochs: int | None) ->
 def _plot_reports(config: dict[str, Any]) -> None:
     figures = RESULTS / "figures"
     figures.mkdir(parents=True, exist_ok=True)
+    from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
+
+    fig, axis = plt.subplots(figsize=(11.5, 4.6), constrained_layout=True)
+    axis.set_xlim(0, 12)
+    axis.set_ylim(0, 5)
+    axis.axis("off")
+    nodes = [
+        (0.3, 3.35, 2.0, 0.85, "Locked datasets and\nDINOv2 embeddings", "#E8F1F8"),
+        (2.7, 3.35, 1.7, 0.85, "Training-fitted\nSLP-6", "#E8F1F8"),
+        (4.8, 3.35, 2.0, 0.85, "Width-depth screen\n5 validation seeds", "#FFF2CC"),
+        (7.2, 3.35, 2.0, 0.85, "Encoding and topology\nablation", "#FFF2CC"),
+        (9.6, 3.35, 2.0, 0.85, "Selection frozen\nbefore test access", "#E2F0D9"),
+        (1.1, 1.25, 2.2, 0.85, "Final analytic test\n10 seeds", "#E4DFEC"),
+        (3.8, 1.25, 2.2, 0.85, "Finite-shot test\n128 to 4096 shots", "#E4DFEC"),
+        (6.5, 1.25, 2.2, 0.85, "Aer noise test\n3 fixed profiles", "#E4DFEC"),
+        (9.2, 1.25, 2.2, 0.85, "Connectivity audit\nand EuroSAT confirm", "#E4DFEC"),
+    ]
+    for x, y, width, height, label, color in nodes:
+        axis.add_patch(FancyBboxPatch((x, y), width, height, boxstyle="round,pad=0.04", facecolor=color, edgecolor="#355C7D", linewidth=1.2))
+        axis.text(x + width / 2, y + height / 2, label, ha="center", va="center", fontsize=9)
+    for left, right in [((2.3, 3.78), (2.7, 3.78)), ((4.4, 3.78), (4.8, 3.78)), ((6.8, 3.78), (7.2, 3.78)), ((9.2, 3.78), (9.6, 3.78))]:
+        axis.add_patch(FancyArrowPatch(left, right, arrowstyle="-|>", mutation_scale=12, linewidth=1.2, color="#355C7D"))
+    axis.add_patch(FancyArrowPatch((10.6, 3.35), (10.6, 2.55), arrowstyle="-|>", mutation_scale=12, linewidth=1.2, color="#355C7D"))
+    axis.plot([2.2, 10.3], [2.55, 2.55], color="#355C7D", linewidth=1.2)
+    for x in (2.2, 4.9, 7.6, 10.3):
+        axis.add_patch(FancyArrowPatch((x, 2.55), (x, 2.1), arrowstyle="-|>", mutation_scale=12, linewidth=1.2, color="#355C7D"))
+    fig.savefig(figures / "figure_00_workflow.png", dpi=300, bbox_inches="tight")
+    fig.savefig(figures / "figure_00_workflow.svg", bbox_inches="tight")
+    plt.close(fig)
+
     screen = aggregate_stage("screen")
     if not screen.empty:
         fig, axes = plt.subplots(1, 2, figsize=(11, 4.2), constrained_layout=True)
@@ -1015,7 +1058,7 @@ def _plot_reports(config: dict[str, Any]) -> None:
         fig.savefig(figures / "figure_01_width_depth_scaling.svg")
         plt.close(fig)
     shot_frames = []
-    for dataset in config["project"]["primary_datasets"]:
+    for dataset in [*config["project"]["primary_datasets"], config["project"]["confirmatory_dataset"]]:
         path = RESULTS / "shots" / dataset / "shot_metrics.csv"
         if path.exists():
             shot_frames.append(pd.read_csv(path))
@@ -1034,6 +1077,67 @@ def _plot_reports(config: dict[str, Any]) -> None:
         axis.legend()
         fig.savefig(figures / "figure_02_finite_shots.png", dpi=300)
         fig.savefig(figures / "figure_02_finite_shots.svg")
+        plt.close(fig)
+
+    noise_path = RESULTS / "tables" / "all_noise_metrics.csv"
+    if noise_path.exists():
+        noise = pd.read_csv(noise_path)
+        test = noise[noise.split == "test"].copy()
+        order = ["analytic", "mild", "medium", "high"]
+        test["profile"] = pd.Categorical(test.profile, categories=order, ordered=True)
+        fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.0), constrained_layout=True)
+        for dataset, rows in test.groupby("dataset", observed=False):
+            rows = rows.sort_values("profile")
+            axes[0].plot(rows.profile.astype(str), rows.macro_f1, marker="o", label=dataset.upper())
+            axes[1].plot(rows.profile.astype(str), rows.ece, marker="o", label=dataset.upper())
+        axes[0].set_ylabel("Test macro-F1")
+        axes[1].set_ylabel("Expected calibration error")
+        for axis in axes:
+            axis.set_xlabel("Noise profile")
+            axis.grid(alpha=0.25)
+            axis.legend(fontsize=8)
+        fig.savefig(figures / "figure_03_noise_sensitivity.png", dpi=300)
+        fig.savefig(figures / "figure_03_noise_sensitivity.svg")
+        plt.close(fig)
+
+    transpilation_path = RESULTS / "tables" / "transpilation_metrics.csv"
+    if transpilation_path.exists():
+        transpilation = pd.read_csv(transpilation_path)
+        subset = transpilation[(transpilation.qubits == 8) & (transpilation.topology == "linear")]
+        fig, axes = plt.subplots(1, 2, figsize=(9.5, 4.0), constrained_layout=True)
+        for entanglement, rows in subset.groupby("entanglement"):
+            rows = rows.sort_values("depth")
+            axes[0].plot(rows.depth, rows.swap_count, marker="o", label=entanglement)
+            axes[1].plot(rows.depth, rows.transpiled_depth, marker="o", label=entanglement)
+        axes[0].set_ylabel("Inserted SWAP gates")
+        axes[1].set_ylabel("Transpiled circuit depth")
+        for axis in axes:
+            axis.set_xlabel("Variational depth")
+            axis.grid(alpha=0.25)
+            axis.legend(title="Logical entanglement", fontsize=8)
+        fig.savefig(figures / "figure_04_connectivity_overhead.png", dpi=300)
+        fig.savefig(figures / "figure_04_connectivity_overhead.svg")
+        plt.close(fig)
+
+    trainability_path = RESULTS / "tables" / "trainability_summary.csv"
+    if trainability_path.exists():
+        trainability = pd.read_csv(trainability_path)
+        fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.2), constrained_layout=True)
+        for axis, dataset in zip(axes, config["project"]["primary_datasets"]):
+            subset = trainability[trainability.dataset == dataset]
+            pivot = subset.pivot(index="qubits", columns="depth", values="grad_var_epoch1_mean")
+            image = axis.imshow(np.log10(pivot.to_numpy()), aspect="auto", cmap="viridis")
+            axis.set_xticks(range(len(pivot.columns)), [str(value) for value in pivot.columns])
+            axis.set_yticks(range(len(pivot.index)), [str(value) for value in pivot.index])
+            axis.set_xlabel("Circuit depth")
+            axis.set_ylabel("Qubits")
+            axis.set_title(dataset.upper())
+            for row in range(len(pivot.index)):
+                for column in range(len(pivot.columns)):
+                    axis.text(column, row, f"{pivot.iloc[row, column]:.1e}", ha="center", va="center", color="white", fontsize=7)
+        fig.colorbar(image, ax=axes, label="log10 first-epoch gradient variance", shrink=0.85)
+        fig.savefig(figures / "figure_05_trainability.png", dpi=300)
+        fig.savefig(figures / "figure_05_trainability.svg")
         plt.close(fig)
 
 
@@ -1077,6 +1181,43 @@ def build_statistical_tables(config: dict[str, Any]) -> None:
             comparison[f"delta_{metric}"] = comparison[metric] - comparison[f"analytic_{metric}"]
         comparison.to_csv(RESULTS / "tables" / "noise_degradation_summary.csv", index=False)
 
+    trainability_records: list[dict[str, Any]] = []
+    for history_path in sorted((RUNS / "screen").glob("*/*/seed_*/training_history.csv")):
+        dataset = history_path.parents[2].name
+        slug = history_path.parents[1].name
+        seed = int(history_path.parent.name.split("_", 1)[1])
+        match = re.match(r"q(\d+)-d(\d+)-", slug)
+        if match is None:
+            continue
+        history = pd.read_csv(history_path)
+        trainability_records.append(
+            {
+                "dataset": dataset,
+                "qubits": int(match.group(1)),
+                "depth": int(match.group(2)),
+                "seed": seed,
+                "epochs": len(history),
+                "grad_norm_epoch1": float(history.iloc[0].gradient_norm_mean),
+                "grad_var_epoch1": float(history.iloc[0].gradient_variance_mean),
+                "grad_norm_median": float(history.gradient_norm_mean.median()),
+                "best_val": float(history.val_macro_f1.max()),
+            }
+        )
+    if trainability_records:
+        trainability = pd.DataFrame(trainability_records)
+        summary = (
+            trainability.groupby(["dataset", "qubits", "depth"], as_index=False)
+            .agg(
+                n=("seed", "count"),
+                epochs_mean=("epochs", "mean"),
+                grad_norm_epoch1_mean=("grad_norm_epoch1", "mean"),
+                grad_var_epoch1_mean=("grad_var_epoch1", "mean"),
+                grad_norm_median_mean=("grad_norm_median", "mean"),
+                best_val_mean=("best_val", "mean"),
+            )
+        )
+        summary.to_csv(RESULTS / "tables" / "trainability_summary.csv", index=False)
+
 
 def build_notebook(config: dict[str, Any]) -> None:
     import nbformat as nbf
@@ -1087,6 +1228,8 @@ def build_notebook(config: dict[str, Any]) -> None:
     cells = [
         nbf.v4.new_markdown_cell("# Article 10: hardware-aware quantum transfer learning\n\nThis executed notebook summarizes immutable outputs from the checkpointed CLI. Architecture selection uses validation only; test evaluation begins only after the frozen-selection sentinel."),
         nbf.v4.new_code_cell("from pathlib import Path\nimport json, pandas as pd\nfrom IPython.display import Image, display\nA10 = Path.cwd().resolve()\njson.loads((A10/'state'/'FINAL_SELECTION_FROZEN.json').read_text())"),
+        nbf.v4.new_markdown_cell("## Validation-locked experimental workflow"),
+        nbf.v4.new_code_cell("display(Image(filename=str(A10/'results'/'figures'/'figure_00_workflow.png')))"),
         nbf.v4.new_markdown_cell("## Validation-only architecture screening"),
         nbf.v4.new_code_cell("pd.read_csv(A10/'results'/'tables'/'screen_validation_summary.csv').sort_values(['dataset','macro_f1_mean'], ascending=[True,False]).groupby('dataset').head(8)"),
         nbf.v4.new_code_cell("display(Image(filename=str(A10/'results'/'figures'/'figure_01_width_depth_scaling.png')))"),
@@ -1097,8 +1240,13 @@ def build_notebook(config: dict[str, Any]) -> None:
         nbf.v4.new_code_cell("display(Image(filename=str(A10/'results'/'figures'/'figure_02_finite_shots.png')))"),
         nbf.v4.new_markdown_cell("## Circuit-level depolarizing and readout noise"),
         nbf.v4.new_code_cell("pd.read_csv(A10/'results'/'tables'/'noise_degradation_summary.csv').query(\"split == 'test'\")"),
+        nbf.v4.new_code_cell("display(Image(filename=str(A10/'results'/'figures'/'figure_03_noise_sensitivity.png')))"),
         nbf.v4.new_markdown_cell("## Connectivity-aware transpilation"),
-        nbf.v4.new_code_cell("pd.read_csv(A10/'results'/'tables'/'transpilation_metrics.csv').head(20)"),
+        nbf.v4.new_code_cell("pd.read_csv(A10/'results'/'tables'/'transpilation_metrics.csv').query(\"qubits == 8 and topology == 'linear'\")"),
+        nbf.v4.new_code_cell("display(Image(filename=str(A10/'results'/'figures'/'figure_04_connectivity_overhead.png')))"),
+        nbf.v4.new_markdown_cell("## Trainability diagnostics"),
+        nbf.v4.new_code_cell("pd.read_csv(A10/'results'/'tables'/'trainability_summary.csv')"),
+        nbf.v4.new_code_cell("display(Image(filename=str(A10/'results'/'figures'/'figure_05_trainability.png')))"),
         nbf.v4.new_markdown_cell("## Re-run instructions\n\nUse `python run_article10.py --stage all --resume`. Set `ARTICLE09_ROOT` to an Article 9 workspace containing the immutable embeddings and fitted SLP-6 representations. Real-hardware execution remains disabled unless separately authorized."),
     ]
     notebook["cells"] = cells
