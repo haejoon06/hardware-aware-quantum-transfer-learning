@@ -209,6 +209,7 @@ The encoding and topology ablation favored one encoding stage and linear entangl
 \caption{Validation-selected configurations and post-freeze analytic test results}\label{tab:selected}
 \centering
 \scriptsize
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lrrrrrrrr@{}}
 \toprule
 \textbf{Dataset} & \textbf{Qubits} & \textbf{Depth} & \textbf{Encoding} & \textbf{Graph} & \textbf{Seeds} & \textbf{Val macro-F1} & \textbf{Test macro-F1} & \textbf{Test accuracy} \\
@@ -218,6 +219,7 @@ PathMNIST & 8 & 6 & Once & Linear & 10 & $0.8108\pm0.0117$ & $0.7422\pm0.0283$ &
 EuroSAT & 8 & 6 & Once & Linear & 5 & $0.8501\pm0.0078$ & $0.8406\pm0.0087$ & $0.8452\pm0.0088$ \\
 \bottomrule
 \end{tabular}
+}
 \end{table}
 
 The EuroSAT confirmation was not a new architecture search. Applying the prespecified eight-qubit, depth-six linear circuit improved validation macro-F1 from $0.7672\pm0.0330$ for the six-qubit, depth-two ring reference to $0.8501\pm0.0078$. The smaller standard deviation also indicates that the selected specification transferred more consistently to the third domain.
