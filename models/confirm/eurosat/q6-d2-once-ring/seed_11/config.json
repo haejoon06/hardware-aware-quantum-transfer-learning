@@ -1,0 +1,10 @@
+{
+  "dataset": "eurosat",
+  "seed": 11,
+  "spec": {
+    "depth": 2,
+    "encoding": "once",
+    "entanglement": "ring",
+    "qubits": 6
+  }
+}

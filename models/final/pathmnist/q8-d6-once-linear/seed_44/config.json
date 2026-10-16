@@ -1,0 +1,10 @@
+{
+  "dataset": "pathmnist",
+  "seed": 44,
+  "spec": {
+    "depth": 6,
+    "encoding": "once",
+    "entanglement": "linear",
+    "qubits": 8
+  }
+}

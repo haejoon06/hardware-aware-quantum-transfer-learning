@@ -1,0 +1,10 @@
+{
+  "dataset": "cifar10",
+  "seed": 55,
+  "spec": {
+    "depth": 4,
+    "encoding": "once",
+    "entanglement": "linear",
+    "qubits": 8
+  }
+}

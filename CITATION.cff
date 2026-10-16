@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this software or its results, please cite the associated article."
+title: "Hardware-Aware Quantum Transfer Learning"
+type: software
+version: 1.0.0
+date-released: 2026-10-16
+authors:
+  - family-names: Juanda
+    given-names: Fajri Yanuar Shiddiq
+    orcid: "https://orcid.org/0009-0007-8894-0265"
+  - family-names: Baihaqi
+    given-names: Kiki Ahmad
+    orcid: "https://orcid.org/0000-0002-2430-9235"
+license: MIT
+repository-code: "https://github.com/haejoon06/hardware-aware-quantum-transfer-learning"
+

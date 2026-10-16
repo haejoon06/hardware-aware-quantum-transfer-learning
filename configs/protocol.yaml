@@ -1,0 +1,53 @@
+project:
+  id: article10
+  title: "From Statevector to Hardware-Aware Quantum Transfer Learning: Shot, Noise, Calibration, and Trainability Effects Across Visual Domains"
+  upstream_project: article09
+  representation: slp6
+  primary_datasets: [cifar10, pathmnist]
+  confirmatory_dataset: eurosat
+  train_per_class: 150
+  val_per_class: 100
+  validation_seed: 2026
+  screening_seeds: [11, 22, 33, 44, 55]
+  final_seeds: [11, 22, 33, 44, 55, 66, 77, 88, 99, 111]
+
+architecture:
+  qubits: [4, 6, 8, 10]
+  depths: [1, 2, 4, 6]
+  screening_encoding: once
+  screening_entanglement: ring
+  ablation_encodings: [once, reupload]
+  ablation_entanglements: [linear, ring]
+  ablation_top_k: 2
+
+training:
+  learning_rate: 0.01
+  weight_decay: 0.0001
+  batch_size: 32
+  max_epochs: 100
+  patience: 12
+  gradient_clip: 1.0
+  backend: default.qubit
+
+finite_shots:
+  levels: [128, 512, 1024, 4096]
+  repetitions: 30
+
+noise:
+  shots: 1024
+  validation_per_class: 30
+  test_per_class: 100
+  profiles:
+    mild: {one_qubit: 0.0005, two_qubit: 0.005, readout: 0.01}
+    medium: {one_qubit: 0.001, two_qubit: 0.01, readout: 0.02}
+    high: {one_qubit: 0.002, two_qubit: 0.02, readout: 0.04}
+
+statistics:
+  ece_bins: 15
+  bootstrap_resamples: 10000
+
+execution:
+  parallel_datasets: 2
+  omp_threads_per_worker: 8
+  real_hardware_enabled: false
+
