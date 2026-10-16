@@ -10,6 +10,10 @@
 \usepackage{multirow}
 \usepackage{url}
 \usepackage{xcolor}
+% The Springer class bundled with the official template references an
+% external Orcidlogo.eps file that is not distributed with the package.
+% Keep the ORCID links active while avoiding that missing optional asset.
+\renewcommand{\orcid}[1]{\href{#1}{\textsuperscript{\textsc{orcid}}}}
 \raggedbottom
 
 \begin{document}
