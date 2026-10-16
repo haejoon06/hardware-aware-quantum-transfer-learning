@@ -39,7 +39,7 @@ Noise mitigation and compilation research provides methods for later device stud
 
 Table~\ref{tab:related} positions the study against adjacent methodological streams. Most visual QML reports emphasize ideal accuracy or a single shot setting. Noise studies often use one task or one architecture, while transpilation studies generally optimize circuits without evaluating predictive stability. We combine these layers in one locked protocol across three visual domains. The same datasets, duplicate-aware partitions, frozen DINOv2 embeddings, six-dimensional learned representation, and training budgets are retained throughout, so the controlled variables are confined to the quantum head and its execution model.
 
-\begin{table*}[htbp]
+\begin{table}[htbp]
 \caption{Related research streams and the unresolved control addressed in this study}\label{tab:related}
 \centering
 \scriptsize
@@ -56,7 +56,7 @@ Hardware mapping & Routing and noise-aware mapping reduce physical overhead \cit
 QML benchmarking & Classical data access and preprocessing can dominate outcomes \cite{HUANG-2021,THANASILP-2024,ODAGIU-2025} & Test-driven tuning can inflate evidence & Validation-only selection, frozen hashes, and one post-freeze test evaluation \\
 \bottomrule
 \end{tabularx}
-\end{table*}
+\end{table}
 
 The study makes four contributions. First, it quantifies how circuit width and depth affect validation performance, optimization time, and gradient statistics. Second, it measures prediction and calibration stability from 128 to 4096 shots over repeated seeds. Third, it separates finite-shot effects from three predeclared circuit-level noise profiles. Fourth, it relates the selected entanglement graph to transpilation depth and SWAP insertion. No result is presented as evidence of quantum advantage, quantum speedup, or performance on a physical device.
 
@@ -66,11 +66,11 @@ The study makes four contributions. First, it quantifies how circuit width and d
 
 Figure~\ref{fig:workflow} summarizes the protocol. Architecture screening used CIFAR-10 and PathMNIST because they represent general-object and histopathology images with different class structures. EuroSAT was reserved as a confirmatory remote-sensing domain. All selection decisions used validation macro-F1, with validation negative log-likelihood (NLL) as a tie-breaker. The selected circuit specification and cryptographic hashes of the test manifests were written to an immutable sentinel before test labels could be loaded. The test set was evaluated after this freeze and was not used to revise the selected configurations.
 
-\begin{figure*}[htbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.98\textwidth]{figures/figure_00_workflow.png}
 \caption{Validation-locked experimental workflow from frozen visual representations to analytic, finite-shot, noisy, and connectivity-aware evaluation}\label{fig:workflow}
-\end{figure*}
+\end{figure}
 
 The screen crossed 4, 6, 8, and 10 qubits with variational depths 1, 2, 4, and 6. Every screening circuit used one encoding stage and ring entanglement and was trained with five seeds (11, 22, 33, 44, and 55). The two best width-depth pairs per primary dataset entered a factorial ablation of encode-once versus data re-uploading and linear versus ring entanglement. The validation-selected finalist was then trained with ten seeds (11, 22, 33, 44, 55, 66, 77, 88, 99, and 111). EuroSAT compared the common robust finalist with a preregistered six-qubit, depth-two ring reference using five seeds. This staged design limited the search while preserving an independent final evaluation.
 
@@ -193,15 +193,15 @@ Macro-F1 was the primary endpoint because it weights each class equally. Seconda
 
 Figure~\ref{fig:scaling} shows the five-seed screen. Increasing depth improved the mean validation macro-F1 until the response flattened or reversed. CIFAR-10 rose from 0.8416 for 8 qubits at depth 1 to 0.9178 at depth 6. PathMNIST rose from 0.6669 to 0.8065 for the same progression. Ten qubits did not improve on eight: at depth 6, CIFAR-10 reached 0.8886 and PathMNIST 0.7654. Width and depth therefore acted as validation-controlled hyperparameters rather than monotonic proxies for quality.
 
-\begin{figure*}[htbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.98\textwidth]{figures/figure_01_width_depth_scaling.png}
 \caption{Validation macro-F1 across circuit width and depth; points show five-seed means and bars show one standard deviation}\label{fig:scaling}
-\end{figure*}
+\end{figure}
 
 The encoding and topology ablation favored one encoding stage and linear entanglement. For CIFAR-10 at 8 qubits and depth 4, switching from ring to linear increased validation macro-F1 from 0.9070 to 0.9259. Re-uploading reduced it to 0.8844 with linear and 0.8658 with ring. For PathMNIST at 8 qubits and depth 6, the corresponding scores were 0.8145 for encode-once linear, 0.8065 for encode-once ring, 0.7433 for re-uploaded linear, and 0.6777 for re-uploaded ring. Table~\ref{tab:selected} reports the locked finalists and their confirmatory result.
 
-\begin{table*}[htbp]
+\begin{table}[htbp]
 \caption{Validation-selected configurations and post-freeze analytic test results}\label{tab:selected}
 \centering
 \scriptsize
@@ -214,7 +214,7 @@ PathMNIST & 8 & 6 & Once & Linear & 10 & $0.8108\pm0.0117$ & $0.7422\pm0.0283$ &
 EuroSAT & 8 & 6 & Once & Linear & 5 & $0.8501\pm0.0078$ & $0.8406\pm0.0087$ & $0.8452\pm0.0088$ \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
 The EuroSAT confirmation was not a new architecture search. Applying the prespecified eight-qubit, depth-six linear circuit improved validation macro-F1 from $0.7672\pm0.0330$ for the six-qubit, depth-two ring reference to $0.8501\pm0.0078$. The smaller standard deviation also indicates that the selected specification transferred more consistently to the third domain.
 
@@ -222,11 +222,11 @@ The EuroSAT confirmation was not a new architecture search. Applying the prespec
 
 Figure~\ref{fig:trainability} summarizes first-epoch gradient variance. The values remained finite for all 32 screened conditions, and every run passed non-finite-gradient checks. The signal nevertheless contracted with width. At depth 6, mean variance decreased from $8.9\times10^{-4}$ at four qubits to $3.2\times10^{-4}$ at ten qubits for CIFAR-10 and from $8.7\times10^{-4}$ to $3.4\times10^{-4}$ for PathMNIST. Ten-qubit training was also slower: CIFAR-10 depth 6 averaged 507.8 s compared with 245.7 s at eight qubits, without a validation gain. These observations support the eight-qubit selection as a performance-compute trade-off but do not establish a barren plateau.
 
-\begin{figure*}[htbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.98\textwidth]{figures/figure_05_trainability.png}
 \caption{Mean first-epoch gradient variance over five seeds for the width-depth screen; cell labels show the untransformed variance}\label{fig:trainability}
-\end{figure*}
+\end{figure}
 
 \subsection{Finite-shot stability}
 
@@ -238,7 +238,7 @@ Figure~\ref{fig:shots} and Table~\ref{tab:shots} show that finite measurement ca
 \caption{Test macro-F1 under finite marginal measurement; points are seed means after 30 repetitions and bars show one standard deviation across seeds}\label{fig:shots}
 \end{figure}
 
-\begin{table*}[htbp]
+\begin{table}[htbp]
 \caption{Finite-shot test results with 95\% bootstrap intervals for the seed mean}\label{tab:shots}
 \centering
 \scriptsize
@@ -259,7 +259,7 @@ Figure~\ref{fig:shots} and Table~\ref{tab:shots} show that finite measurement ca
  & Analytic & 0.8406 & [0.8337, 0.8481] & 0 & 0 \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
 The result differs from reports of large low-shot degradation in other architectures \cite{CHEN-2024}. Our circuit was trained analytically and evaluated by sampling marginal observables after training, whereas shot-based optimization injects measurement noise into every gradient update. The present evidence therefore supports inference stability of the trained head; it does not imply that training the same model with 128-shot gradients would be equally stable.
 
@@ -267,13 +267,13 @@ The result differs from reports of large low-shot degradation in other architect
 
 Noise affected the three domains differently (Fig.~\ref{fig:noise}). CIFAR-10 macro-F1 remained near 0.905 across all profiles, but ECE increased from 0.0398 analytically to 0.1437 under the high profile. Predictive labels were stable while confidence quality deteriorated. PathMNIST showed the largest class-decision effect: high noise reduced macro-F1 from 0.7632 to 0.7382 and flipped 8.33\% of analytic labels. EuroSAT decreased from 0.8315 to 0.8248 with a 7.30\% label-flip rate. Table~\ref{tab:noise} reports the test subset values.
 
-\begin{figure*}[htbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.98\textwidth]{figures/figure_03_noise_sensitivity.png}
 \caption{Macro-F1 and calibration sensitivity under fixed Aer depolarizing and readout profiles; each dataset uses one median-validation seed and a fixed stratified test subset}\label{fig:noise}
-\end{figure*}
+\end{figure}
 
-\begin{table*}[htbp]
+\begin{table}[htbp]
 \caption{Circuit-noise sensitivity on fixed stratified test subsets}\label{tab:noise}
 \centering
 \scriptsize
@@ -297,7 +297,7 @@ Noise affected the three domains differently (Fig.~\ref{fig:noise}). CIFAR-10 ma
  & High & 0.8248 & 0.7066 & 0.0879 & 0.0384 & 0.0730 \\
 \bottomrule
 \end{tabular}
-\end{table*}
+\end{table}
 
 Some mild and medium profiles lowered NLL or slightly increased macro-F1. These isolated changes should not be interpreted as a beneficial hardware effect. The analysis uses finite stochastic samples, one representative seed, and generic channels; noise can soften overconfident logits while simultaneously moving individual decisions. Probability drift and label flips increase monotonically, providing the more direct evidence of perturbation.
 
@@ -305,11 +305,11 @@ Some mild and medium profiles lowered NLL or slightly increased macro-F1. These 
 
 The selected linear entanglement graph maps directly to a line. For eight qubits, depths 1, 2, 4, and 6 required no SWAP gates and compiled to depths 7, 9, 13, and 17. A ring logical graph mapped to the same line required 6, 14, 34, and 60 SWAP gates and compiled to depths 13, 27, 56, and 85 (Fig.~\ref{fig:connectivity}). Thus, the validation-preferred linear graph also avoided routing overhead on the restrictive topology. This alignment was not imposed during model selection.
 
-\begin{figure*}[htbp]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=0.94\textwidth]{figures/figure_04_connectivity_overhead.png}
 \caption{Routing overhead for eight-qubit encode-once circuits transpiled to a bidirectional line}\label{fig:connectivity}
-\end{figure*}
+\end{figure}
 
 The result does not mean that a line is universally preferable. A device with richer coupling may execute a ring without added swaps, and calibrated error rates can outweigh topology alone. It does show that a logical design decision can simultaneously affect validation performance and compilation cost, so reporting the circuit graph without its target connectivity is insufficient for deployment-oriented comparisons.
 
@@ -350,11 +350,13 @@ CIFAR-10, EuroSAT, and PathMNIST are publicly available from their original prov
 \bmhead{Code availability}
 Source code, the executed notebook, configuration files, checkpoints, figures, and model archive are available at \url{https://github.com/haejoon06/hardware-aware-quantum-transfer-learning}.
 
+\section*{Declarations}
+
 \bmhead{Ethics approval}
 Not applicable. The study used public benchmark datasets and did not involve human participants, identifiable personal data, or animal experiments.
 
-\bmhead{Competing interests}
-The authors declare no competing interests.
+\bmhead{Conflict of interest}
+The authors declare that they have no conflict of interest.
 
 \bmhead{Use of generative artificial intelligence}
 A generative artificial intelligence tool assisted with manuscript drafting, language editing, and document formatting. The authors verified all numerical claims against the archived outputs and take responsibility for the final content.

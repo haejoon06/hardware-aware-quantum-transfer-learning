@@ -1,20 +1,20 @@
 {
-  "completed_at": "2026-10-16T01:14:00.308111+00:00",
+  "completed_at": "2026-10-16T02:50:56.671798+00:00",
   "figures": {
-    "figure_00_workflow.png": "17b614ddc2da2659818a1b2514471aebfe8b6abfe14ca97bd9af9ce9aef2c270",
-    "figure_00_workflow.svg": "8638049ae72fb979299f02d3032cf54581ceedef2339e5e5436525d22d821716",
+    "figure_00_workflow.png": "c4318174ca48d08a4f272ddac78444aaeba53cf2e5a4710bd1bfaa7f631fde2c",
+    "figure_00_workflow.svg": "17637f99309077207f878ac84ef1f8e0eed4f79e9f7d0d5f1bc2f8c18ee7f523",
     "figure_01_width_depth_scaling.png": "66faffcc579b8de2133d824eb522311cd7cd7d7c8fcae6b10c0ecf12a38655c7",
-    "figure_01_width_depth_scaling.svg": "357a02d62f1e130657115d5a682b32af3d7535fa8a6bb7d1ff17a88301b47684",
+    "figure_01_width_depth_scaling.svg": "3a3a703b71399f40699c93787cad9920f0cca9a63d378fd91c4d37a3329f1479",
     "figure_02_finite_shots.png": "a0b497d1a3dc829433d566353d8ba2252fd67146aed3381889909db658c6c22d",
-    "figure_02_finite_shots.svg": "1bd77a2c1cfd5150d55b06ffdd2a305f9a881ffd7d89aa2df39667743c362086",
+    "figure_02_finite_shots.svg": "4732dc599b2a764583577fc8d308b3c5853c4bd076e05066e21f0cc8426d0fac",
     "figure_03_noise_sensitivity.png": "1299588bd42f4a0a574668a1f4f1057c8cc81f825f38864b2e2f2a064d682ebd",
-    "figure_03_noise_sensitivity.svg": "13da3433a9537b27fedcdfbb14832ddcf848ebef9cd2b31dabc7eaaea57ef93a",
+    "figure_03_noise_sensitivity.svg": "e9ef95dc95248b965cbea5c0feaec6e3cea5a7613a11d7683d431386c7dfd2a1",
     "figure_04_connectivity_overhead.png": "b5cdb4224868b51837adfd47b51c6dbe7419d612e1f1cd5161606e63de7ef6ee",
-    "figure_04_connectivity_overhead.svg": "c334dec05d295436140bac70b1b71d301383c657cfdb75c525f5442793511608",
+    "figure_04_connectivity_overhead.svg": "074d845e5284541b6789a366bf60eec02f0d77dcf10e6a2b56a5f1a0515b8db4",
     "figure_05_trainability.png": "cc92fd2d390d205d39e44855248749f250b842e035d2e18d15c2dcaa575bea2a",
-    "figure_05_trainability.svg": "cee5dd794ec7839c774552e63d40d7b43298f185d0a60574b0bc6cfd72ebe4f3"
+    "figure_05_trainability.svg": "a77fbbb6e6e82fa966b0998826fbe57d66fb9d76655333f0fcebfebc0c0e793f"
   },
-  "notebook": "e65cdaf88688d181a7a2025507a0d9bd440d62b4b85ce931888d3b0e888cf9e5",
+  "notebook": "bb23ed65c38cb488bb99640825c43f3c1f74259a6e4f1c830544ab2b95bbdfec",
   "protocol_sha256": "76f3d7c0330632b86c92d140f2ded5a67944176d07ad001e46992156dbcfb22b",
   "selection": {
     "candidate_summary_sha256": "f1e448a944013cb5f45742d24d6baeea643e76d6381a479a34da11e895bc8f05",

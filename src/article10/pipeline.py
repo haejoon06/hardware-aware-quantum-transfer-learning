@@ -1013,30 +1013,36 @@ def _plot_reports(config: dict[str, Any]) -> None:
     figures.mkdir(parents=True, exist_ok=True)
     from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
-    fig, axis = plt.subplots(figsize=(11.5, 4.6), constrained_layout=True)
+    fig, axis = plt.subplots(figsize=(7.2, 3.15), constrained_layout=True)
     axis.set_xlim(0, 12)
-    axis.set_ylim(0, 5)
+    axis.set_ylim(0, 4)
     axis.axis("off")
     nodes = [
-        (0.3, 3.35, 2.0, 0.85, "Locked datasets and\nDINOv2 embeddings", "#E8F1F8"),
-        (2.7, 3.35, 1.7, 0.85, "Training-fitted\nSLP-6", "#E8F1F8"),
-        (4.8, 3.35, 2.0, 0.85, "Width-depth screen\n5 validation seeds", "#FFF2CC"),
-        (7.2, 3.35, 2.0, 0.85, "Encoding and topology\nablation", "#FFF2CC"),
-        (9.6, 3.35, 2.0, 0.85, "Selection frozen\nbefore test access", "#E2F0D9"),
-        (1.1, 1.25, 2.2, 0.85, "Final analytic test\n10 seeds", "#E4DFEC"),
-        (3.8, 1.25, 2.2, 0.85, "Finite-shot test\n128 to 4096 shots", "#E4DFEC"),
-        (6.5, 1.25, 2.2, 0.85, "Aer noise test\n3 fixed profiles", "#E4DFEC"),
-        (9.2, 1.25, 2.2, 0.85, "Connectivity audit\nand EuroSAT confirm", "#E4DFEC"),
+        (0.35, 2.92, 3.1, 0.72, "1  Locked partitions\nand test hashes", "#E8F1F8"),
+        (4.45, 2.92, 3.1, 0.72, "2  Frozen DINOv2\nand SLP-6", "#E8F1F8"),
+        (8.55, 2.92, 3.1, 0.72, "3  Validation-only\nmodel selection", "#FFF2CC"),
     ]
     for x, y, width, height, label, color in nodes:
-        axis.add_patch(FancyBboxPatch((x, y), width, height, boxstyle="round,pad=0.04", facecolor=color, edgecolor="#355C7D", linewidth=1.2))
-        axis.text(x + width / 2, y + height / 2, label, ha="center", va="center", fontsize=9)
-    for left, right in [((2.3, 3.78), (2.7, 3.78)), ((4.4, 3.78), (4.8, 3.78)), ((6.8, 3.78), (7.2, 3.78)), ((9.2, 3.78), (9.6, 3.78))]:
-        axis.add_patch(FancyArrowPatch(left, right, arrowstyle="-|>", mutation_scale=12, linewidth=1.2, color="#355C7D"))
-    axis.add_patch(FancyArrowPatch((10.6, 3.35), (10.6, 2.55), arrowstyle="-|>", mutation_scale=12, linewidth=1.2, color="#355C7D"))
-    axis.plot([2.2, 10.3], [2.55, 2.55], color="#355C7D", linewidth=1.2)
-    for x in (2.2, 4.9, 7.6, 10.3):
-        axis.add_patch(FancyArrowPatch((x, 2.55), (x, 2.1), arrowstyle="-|>", mutation_scale=12, linewidth=1.2, color="#355C7D"))
+        axis.add_patch(FancyBboxPatch((x, y), width, height, boxstyle="round,pad=0.035", facecolor=color, edgecolor="#355C7D", linewidth=1.15))
+        axis.text(x + width / 2, y + height / 2, label, ha="center", va="center", fontsize=9.2, fontweight="semibold")
+    for left, right in [((3.45, 3.28), (4.45, 3.28)), ((7.55, 3.28), (8.55, 3.28))]:
+        axis.add_patch(FancyArrowPatch(left, right, arrowstyle="-|>", mutation_scale=12, linewidth=1.15, color="#355C7D"))
+
+    panel_x, panel_y, panel_w, panel_h = 0.35, 0.35, 11.3, 1.62
+    axis.add_patch(FancyBboxPatch((panel_x, panel_y), panel_w, panel_h, boxstyle="round,pad=0.04", facecolor="#FAFAFA", edgecolor="#777777", linewidth=1.0))
+    axis.text(6.0, 1.68, "Frozen finalist: independent post-selection evaluation", ha="center", va="center", fontsize=9.4, fontweight="bold")
+    axis.add_patch(FancyArrowPatch((10.1, 2.92), (10.1, 1.97), arrowstyle="-|>", mutation_scale=12, linewidth=1.15, color="#355C7D"))
+
+    evaluations = [
+        (0.65, "Analytic test\n10 seeds"),
+        (2.85, "Finite-shot test\n128-4096 shots"),
+        (5.05, "Noise sensitivity\n3 fixed profiles"),
+        (7.25, "Connectivity audit\n3 coupling maps"),
+        (9.45, "EuroSAT\nconfirmation\n5 seeds"),
+    ]
+    for x, label in evaluations:
+        axis.add_patch(FancyBboxPatch((x, 0.62), 1.9, 0.72, boxstyle="round,pad=0.03", facecolor="#E9E3F2", edgecolor="#5F4B8B", linewidth=1.0))
+        axis.text(x + 0.95, 0.98, label, ha="center", va="center", fontsize=8.5)
     fig.savefig(figures / "figure_00_workflow.png", dpi=300, bbox_inches="tight")
     fig.savefig(figures / "figure_00_workflow.svg", bbox_inches="tight")
     plt.close(fig)
